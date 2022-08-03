@@ -119,9 +119,13 @@ public class App extends Application {
     final Integer[][] SPEED_RANGE_REQUIRED_OBSTACLES_ARRAY_STG4 = {{90, 100}, {230, 280}, {250, 300}, {270, 300}, {280, 290}, {120, 160}, {80, 90}, {90, 100}};
     final Integer[][] ALTITUDE_RANGE_REQUIRED_OBSTACLES_ARRAY_STG4 = {{0, 0}, {200, 250}, {400, 420}, {370, 390}, {280, 320}, {200, 250}, {80, 90}, {90, 100}};
     final double[][] PITCH_ARRAY = {{0, -5, 60, 100}, {1, -4, 45, 75}, {2, -3, 30, 50}, {3, -2, 20, 33}, {4, -1, 10, 17}, {5, 0, 0, 0}, {6, 1, 10, 0.889}, {7, 2, 20, 0.778}, {8, 3, 30, 0.667}, {9, 4, 45, 0.5}, {10, 5, 60, 0.333}}; // if climbing multiply max speed of thrust-level by factor, if descending, add factor on to max
-    final Integer[][] THRUST_ARRAY = {{0, 0}, {1, 10}, {2, 20}, {3, 30}, {4, 40}, {5, 50}, {6, 60}, {7, 70}, {8, 80}, {9, 90}, {10, 100}, {11, 110}, {12, 120}, {13, 130}, {14, 140}, {15, 150}, {16, 160}, {17, 170}, {18, 180}, {19, 190}, {20, 200}, {21, 210}, {22, 220}, {23, 230}, {24, 240}, {25, 250}, {26, 260}, {27, 270}, {28, 280}, {29, 290}, {30, 300}};
-    final Integer[][] ORIGINAL_THRUST_ARRAY = {{0, 0}, {1, 10}, {2, 20}, {3, 30}, {4, 40}, {5, 50}, {6, 60}, {7, 70}, {8, 80}, {9, 90}, {10, 100}, {11, 110}, {12, 120}, {13, 130}, {14, 140}, {15, 150}, {16, 160}, {17, 170}, {18, 180}, {19, 190}, {20, 200}, {21, 210}, {22, 220}, {23, 230}, {24, 240}, {25, 250}, {26, 260}, {27, 270}, {28, 280}, {29, 290}, {30, 300}};
-    final Integer[][] ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY = {{80, 50}, {250, 100}, {300, 130}, {350, 150}, {400, 170}, {450, 190}};
+    final double[][] THRUST_ARRAY = {{0, 0}, {1, 10}, {2, 20}, {3, 30}, {4, 40}, {5, 50}, {6, 60}, {7, 70}, {8, 80}, {9, 90}, {10, 100}, {11, 110}, {12, 120}, {13, 130}, {14, 140}, {15, 150}, {16, 160}, {17, 170}, {18, 180}, {19, 190}, {20, 200}, {21, 210}, {22, 220}, {23, 230}, {24, 240}, {25, 250}, {26, 260}, {27, 270}, {28, 280}, {29, 290}, {30, 300}};
+
+    final double[][] ORIGINAL_THRUST_ARRAY = {{0, 0}, {1, 10}, {2, 20}, {3, 30}, {4, 40}, {5, 50}, {6, 60}, {7, 70}, {8, 80}, {9, 90}, {10, 100}, {11, 110}, {12, 120}, {13, 130}, {14, 140}, {15, 150}, {16, 160}, {17, 170}, {18, 180}, {19, 190}, {20, 200}, {21, 210}, {22, 220}, {23, 230}, {24, 240}, {25, 250}, {26, 260}, {27, 270}, {28, 280}, {29, 290}, {30, 300}};
+
+    final double[][] THRUST_ARRAY_ADJUSTED_FOR_PITCH = {{0, 0}, {1, 10}, {2, 20}, {3, 30}, {4, 40}, {5, 50}, {6, 60}, {7, 70}, {8, 80}, {9, 90}, {10, 100}, {11, 110}, {12, 120}, {13, 130}, {14, 140}, {15, 150}, {16, 160}, {17, 170}, {18, 180}, {19, 190}, {20, 200}, {21, 210}, {22, 220}, {23, 230}, {24, 240}, {25, 250}, {26, 260}, {27, 270}, {28, 280}, {29, 290}, {30, 300}};
+
+    final Integer[][] ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY = {{80, 50, 0, 0}, {250, 60, 20, 20}, {300, 80, 40, 20}, {350, 110, 60, 20}, {400, 130, 80, 20}, {450, 150, 100, 20}}; //up to and including given altitude, stall speed shown, then adjuster for IAS
     final String[] DEGREES_ARRAY = {"-60º", "-45º", "-30º", "-20º", "-10º", "Level", "+10º", "+20º", "+30º", "+45º", "+60º"};
 
     /**------------------------------------------INITIAL VARIABLES------------------------------------------------ */
@@ -181,12 +185,12 @@ public class App extends Application {
     int randomGoalMovementModifier, driveFirstClickFlag, obstacleTarget, costOfFailureValue,timerObstacleValue, originalTimerObstacleValue, passObstacleFlag, speedRangePermitted, speedRangeActual, generalTimerElapsedSeconds, generalTimerSecondsToDisplay, generalTimerElapsedMinutes;
     int nitroBeingUsed, numberOfActiveNitros, nitrousBoostsRemainingCount, countDisplay, distanceToEndOfStageGoalAfterFail, requiredLeftClicks, requiredRightClicks, countTimesPassTimeUntilEndOStageGoal, leftClickCount, rightClickCount;
     int ripGearOffValue, thrustLevel, approachTrigger, timeUntilAuxiliaryButtonDisappears, nitroRechargeValue, nitroTicks1, nitroTicks2, nitroTicks3, nitroTicks4, nitroTicks5, originalGeneralTimerValue1, originalGeneralTimerValue2, originalGeneralTimerValue3, originalGeneralTimerValue4, originalGeneralTimerValue5;
-    int originalOverSpeedTimerValue, recoverySpeed, newMaxSpeedAdjustedForPitch, randomSubHundredFeetValue, stallActive, altitudeZone, currentPitchToDisplay, currentPitch, altitudeRangeActual, altitudeRangePermitted;
-    double altitude, indicatedAirspeedValue, altitudeGain, finalProportionPercentage, currentSpeedProportionOfMaxForThrustLevel, accelerationAmount, speedKnots, nextSuccessfulObstacleLeavesDistance, originalCPS, preNitroCPS1, preNitroCPS2, preNitroCPS3, preNitroCPS4, preNitroCPS5, clicksPerSecond, speedKmH, nextObstDistance;
+    int originalOverSpeedTimerValue, recoverySpeed, randomSubHundredFeetValue, stallActive, altitudeZone, currentPitchToDisplay, currentPitch, altitudeRangeActual, altitudeRangePermitted;
+    double newMaxSpeedAdjustedForPitch, altitudeAdjustedThrustArrayValue, altitudeProportion, altitude, indicatedAirspeedValue, altitudeGain, finalProportionPercentage, currentSpeedProportionOfMaxForThrustLevel, accelerationAmount, speedKnots, nextSuccessfulObstacleLeavesDistance, originalCPS, preNitroCPS1, preNitroCPS2, preNitroCPS3, preNitroCPS4, preNitroCPS5, clicksPerSecond, speedKmH, nextObstDistance;
     float repairCounterPercent;
     boolean overSpeedFlag, rippedGearOff, speedDegrading, hasTookOff, parachuteActive, dropZoneFlag, parachuteZoneFlag, landingGearUpFlag, BeginningOfADrivingStage, timerOn, delayObstaclePanelOn, button1Unlocked, button2Unlocked, mechanicTriggeredYet, button3Unlocked, driveUnlocked, carInMechanic, hasIncreasedSpeedFromZeroOnCurrentStageFlag, displayObstacleConditionsFlag, costOfFailureFirstIterationFlag;
     boolean failedObstacleWithinApproachOfEndOfStageGoal, approachingEndOfStageGoalFlag, checkTimeGoalMoveCount, startDelayTimerFlag, countDownToPassObstacleOn, startCountDownToPassObstacleFlag, wasPassingNowFailing, moreThanOneMinuteElapsedFlag;
-    boolean planeBrokeFlag, stage4Start, approachFlag, adjustmentFlag, gameOverFlag, timerAuxiliaryButtonDisappearFlag, nitroSpeedUp1, nitroSpeedUp2, nitroSpeedUp3, nitroSpeedUp4, nitroSpeedUp5, nitro1, nitro2, nitro3, nitro4, nitro5, degradeNitro1, degradeNitro2, degradeNitro3, degradeNitro4, degradeNitro5, overDrive, atStartEngineScreen;
+    boolean altitudeZoneChangedFlag, planeBrokeFlag, stage4Start, approachFlag, adjustmentFlag, gameOverFlag, timerAuxiliaryButtonDisappearFlag, nitroSpeedUp1, nitroSpeedUp2, nitroSpeedUp3, nitroSpeedUp4, nitroSpeedUp5, nitro1, nitro2, nitro3, nitro4, nitro5, degradeNitro1, degradeNitro2, degradeNitro3, degradeNitro4, degradeNitro5, overDrive, atStartEngineScreen;
     boolean[] nitrosArray = {false, false, false, false, false};
 
     /**----------------------------------------------SET UP USER INTERFACE--------------------------------------------------*/
@@ -244,7 +248,7 @@ public class App extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws IOException{}
+    public void start(Stage stage) {}
 
     public void createFont(){
         font1 = new Font("Arial", Font.PLAIN, 32);
@@ -580,8 +584,11 @@ public class App extends Application {
         timer = new Timer(timerSpeed, e -> {
             clickCount++;
             if (stage == 4 && hasTookOff) {
-                adjustSpeedForPitch();
                 calculateAltitude();
+                if (altitudeZoneChangedFlag){
+                    adjustSpeedForAltitudeZone();
+                }
+                adjustSpeedForPitch();
                 if (altitude <= 0) {
                     gameOver();
                 }
@@ -606,7 +613,17 @@ public class App extends Application {
                     altitudeHundredthsDisplayValue.setText("00");
                 }
 
-                indicatedAirspeedValue = (int) clicksPerSecond; //change with altitude adjustment calculation
+                switch (altitudeZone) {
+                    case 0:
+                        indicatedAirspeedValue = clicksPerSecond; // sraheel this is when the plane is down near the ground and clicksPerSecond should not be changed as it is the base speed before modifying.  Modifying is done in indicatedAirSpeedValue
+                        break;
+                    case 1, 2, 3, 4, 5: // sraheel this is where the speed is altered on each tick by the altitudeProportion calculated
+                        while (indicatedAirspeedValue > (altitudeAdjustedThrustArrayValue / 100)) {
+                            indicatedAirspeedValue = indicatedAirspeedValue - (ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[altitudeZone][2] * altitudeProportion);
+                        }
+                        break;
+                }
+
                 indAS = String.format("%03d", (int) indicatedAirspeedValue);
                 indicatedAirspeed.setText(indAS + "IAS");
                 if (indicatedAirspeedValue > (MAX_SPEED_OF_JET_WITHOUT_OVERSPEEDING) && !overSpeedFlag) {
@@ -926,6 +943,7 @@ public class App extends Application {
                 case 10 -> newMaxSpeedAdjustedForPitch = (ORIGINAL_THRUST_ARRAY[thrustLevel][1] / 3) - ORIGINAL_THRUST_ARRAY[thrustLevel][1];
             }
             THRUST_ARRAY[thrustLevel][1] = ORIGINAL_THRUST_ARRAY[thrustLevel][1] + newMaxSpeedAdjustedForPitch;
+            THRUST_ARRAY_ADJUSTED_FOR_PITCH[thrustLevel][1] = ORIGINAL_THRUST_ARRAY[thrustLevel][1] + newMaxSpeedAdjustedForPitch;
             if (altitudeZone == 5) {
                 System.out.println("Speed adjusts to: " + THRUST_ARRAY[thrustLevel][1] + " and current stall speed = " + ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[altitudeZone][1] + " you wont get higher than FL450 " + "Recovery Speed should be: " + (ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[altitudeZone][1] + STALL_RECOVERY_COEFFICIENT));
             } else {
@@ -947,18 +965,23 @@ public class App extends Application {
             case 0,1,2,3,4 -> altitude = (altitude - altitudeGain);
             case 5,6,7,8,9,10 -> altitude = (altitude + altitudeGain);
         }
-        if (altitude > 0 && altitude <= 50) {
-            altitudeZone = 0;
-        } else if (altitude > 50 && altitude <= 250) {
-            altitudeZone = 1;
-        }else if (altitude > 250 && altitude <= 300) {
-            altitudeZone = 2;
-        } else if (altitude > 300 && altitude <= 350) {
-            altitudeZone = 3;
-        } else if (altitude > 350 && altitude <= 400) {
-            altitudeZone = 4;
-        } else if (altitude > 400 && altitude <= 450) {
-            altitudeZone = 5;
+        if (altitude > ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[altitudeZone][0] && altitude <= ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[5][0]) {
+            altitudeZone++;
+            altitudeZoneChangedFlag = true; //sraheel this flag affects the calling of the method adjustSpeedForAltitudeZone()
+        }
+    }
+
+    private void adjustSpeedForAltitudeZone() { //sraheel this method affects it
+        if (altitudeZone > 0) {
+            double altitudeDifferenceBetweenAltitudeZones = ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[altitudeZone][0] - ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[altitudeZone - 1][0];
+            double altitudeDifferenceBetweenCurrentAndPreviousAltitudeMax = altitude - ALTITUDE_STALL_MAX_SPEED_RELATIONSHIP_ARRAY[altitudeZone - 1][0];
+            altitudeProportion = (100 / altitudeDifferenceBetweenAltitudeZones) * altitudeDifferenceBetweenCurrentAndPreviousAltitudeMax;
+            if (THRUST_ARRAY[thrustLevel][1] > ((THRUST_ARRAY_ADJUSTED_FOR_PITCH[thrustLevel][1] / 100)) * (100 - altitudeProportion)) { //sraheel I think the core problem is in this if condition
+                THRUST_ARRAY[thrustLevel][1] = THRUST_ARRAY[thrustLevel][1] * (100 - altitudeProportion); // sraheel this sets the speed on each "tick" until it reduces down to altitudeProportion%
+            } else {
+                altitudeZoneChangedFlag = false;
+            }
+            altitudeAdjustedThrustArrayValue = THRUST_ARRAY[thrustLevel][1];
         }
     }
 
@@ -985,11 +1008,11 @@ public class App extends Application {
         button1.setText("Thrust +");
         button1.setActionCommand("ThrustUp");
         for (int i = 0; i < THRUST_ARRAY.length; i++) { //sets thrust level to be nearest to keep speed similar to require user action
-            if (indicatedAirspeedValue <= ORIGINAL_THRUST_ARRAY[i][1] && indicatedAirspeedValue > ORIGINAL_THRUST_ARRAY[i-1][1]) {
+            if (indicatedAirspeedValue <= ORIGINAL_THRUST_ARRAY[i][1] && indicatedAirspeedValue > ORIGINAL_THRUST_ARRAY[i - 1][1]) {
                 if (thrustLevel < 10) {
-                    thrustLevel = ORIGINAL_THRUST_ARRAY[10][0];
+                    thrustLevel = (int) ORIGINAL_THRUST_ARRAY[10][0];
                 } else {
-                    thrustLevel = ORIGINAL_THRUST_ARRAY[i][0];
+                    thrustLevel = (int) ORIGINAL_THRUST_ARRAY[i][0];
                 }
                 break;
             }
@@ -1227,7 +1250,7 @@ public class App extends Application {
         if (count == 1) { //bug fix for when passing and no button clicks allowing passing of next obstacle
             double originalSpeed = clicksPerSecond;
             adjustmentFlag = true;
-            if (stage == 4) {
+            if (stage == 4 && hasTookOff) {
                 button2.doClick();
                 button1.doClick();
             } else if (stage == 2 || stage == 3) {
@@ -2051,6 +2074,7 @@ public class App extends Application {
                 case "ThrustUp":
                         originalCPS = clicksPerSecond;
                         if (thrustLevel < 30 && thrustLevel >= 0) {
+                            speedDegrading = false;
                             thrustLevel++;
                         }
                         if (stage4Start) {
@@ -2483,7 +2507,7 @@ public class App extends Application {
 
     private void setInitialVariables(boolean restart) {
         if (restart) {
-            planeBrokeFlag = false; overSpeedFlag = false; rippedGearOff = false; speedDegrading = false; hasTookOff = false; parachuteActive =false; stage4Start = false; landingGearUpFlag = false; dropZoneFlag = false; parachuteZoneFlag = false; approachFlag = false; adjustmentFlag = false; gameOverFlag = false; timerAuxiliaryButtonDisappearFlag = false; BeginningOfADrivingStage = false; timerOn = false; delayObstaclePanelOn = false; button1Unlocked = false; button2Unlocked = false; mechanicTriggeredYet = false; displayObstacleConditionsFlag = false;
+            altitudeZoneChangedFlag = false; planeBrokeFlag = false; overSpeedFlag = false; rippedGearOff = false; speedDegrading = false; hasTookOff = false; parachuteActive =false; stage4Start = false; landingGearUpFlag = false; dropZoneFlag = false; parachuteZoneFlag = false; approachFlag = false; adjustmentFlag = false; gameOverFlag = false; timerAuxiliaryButtonDisappearFlag = false; BeginningOfADrivingStage = false; timerOn = false; delayObstaclePanelOn = false; button1Unlocked = false; button2Unlocked = false; mechanicTriggeredYet = false; displayObstacleConditionsFlag = false;
             failedObstacleWithinApproachOfEndOfStageGoal = false; approachingEndOfStageGoalFlag = false; checkTimeGoalMoveCount = false; startDelayTimerFlag = false; countDownToPassObstacleOn = false; startCountDownToPassObstacleFlag = false; wasPassingNowFailing = false; moreThanOneMinuteElapsedFlag = false; button3Unlocked = false; driveUnlocked = false; carInMechanic = false; hasIncreasedSpeedFromZeroOnCurrentStageFlag = false;
             degradeNitro1 = false; degradeNitro2 = false; degradeNitro3 = false; degradeNitro4 = false; degradeNitro5 = false; nitro1 = false; nitro2 = false; nitro3 = false; nitro4 = false; nitro5 = false; nitroSpeedUp1 = false; nitroSpeedUp2 = false; nitroSpeedUp3 = false; nitroSpeedUp4 = false; nitroSpeedUp5 = false; overDrive = false; atStartEngineScreen = false; costOfFailureFirstIterationFlag = false;
             try {
@@ -2511,6 +2535,8 @@ public class App extends Application {
                 System.out.println("general timer didn't exist.");
             }
         }
+        altitudeAdjustedThrustArrayValue = 0;
+        altitudeProportion = 0;
         originalOverSpeedTimerValue = 0;
         recoverySpeed = 0;
         newMaxSpeedAdjustedForPitch = 0;
@@ -2856,8 +2882,8 @@ public class App extends Application {
         altString = String.format("%03d", (int) altitude);
         altitudeDisplayValue.setText(altString);
         altitudeHundredthsDisplayValue.setText("00");
-        indicatedAirspeedValue = (int) clicksPerSecond; //change with altitude adjustment calculation
-        indAS = String.format("%03d", (int) indicatedAirspeedValue);
+        indicatedAirspeedValue = 0;
+        indAS = String.format("%03d", 0);
         indicatedAirspeed.setText(indAS + "IAS");
         priceLabelPanel.setVisible(false);
         pricePanel.setVisible(false);
