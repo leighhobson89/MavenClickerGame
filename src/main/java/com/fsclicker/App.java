@@ -1,9 +1,6 @@
 package com.fsclicker;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.awt.BasicStroke;
@@ -194,24 +191,6 @@ public class App extends Application {
     boolean[] nitrosArray = {false, false, false, false, false};
 
     /**----------------------------------------------SET UP USER INTERFACE--------------------------------------------------*/
-
-    /*private static Scene scene;
-
-    @Override
-    public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-    }
-
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
-    }*/
     
     public static void main(String[] args) {
         try {
@@ -1589,7 +1568,7 @@ public class App extends Application {
         if (stage == 4 && clickCount > ripGearOffValue - 500 && !landingGearUpFlag) {
             buttonAuxiliary.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(5.0f), Color.red));
         }
-        if (stage == 4 && !landingGearUpFlag && clicksPerSecond > 100 || (clickCount > ripGearOffValue && !landingGearUpFlag)) {
+        if (stage == 4 && !landingGearUpFlag && clicksPerSecond > 100 || (stage == 4 && clickCount > ripGearOffValue && !landingGearUpFlag)) {
             rippedGearOff = true;
             gameOver();
         }
@@ -1751,15 +1730,13 @@ public class App extends Application {
             switch(action) {
                 case "pushCar":
                 if (!button3Unlocked && clickCount < PRICE_TO_UNLOCK_MECHANIC && stage == 1) {
-                    clickCount = clickCount + 1750; //replace with clickCount++ for real, or clickCount = clickCount + 1750 for debug
+                    clickCount++; //replace with clickCount++ for real, or clickCount = clickCount + 1750 for debug
                     clickCountLabel.setText(clickCount+"m");
-
                     if (!button1Unlocked && clickCount >= PRICE_TO_UNLOCK_HIRED_HELP) {
                         button1Unlocked = true;
                         button1.setText("Hired Help");
                         price1.setText(autoClickerPrice + "m");
                         price2.setText(towTruckPrice + "m");
-
                     }
 
                     if (!button2Unlocked && clickCount >= PRICE_TO_UNLOCK_TOW_TRUCK) {
@@ -1844,7 +1821,7 @@ public class App extends Application {
                         repairCounterPercent = (float) repairCounter / CLICKS_TO_FIX_CAR * 100;
                         String repairPercentString = String.format("%.2f", repairCounterPercent);
                         button3.setText(repairPercentString + "% fixed");
-                        repairCounterPercent = 100; //DEBUG LINE - repairCounterPercent = 100; for debug delete for normal
+//                        repairCounterPercent = 100; //DEBUG LINE - repairCounterPercent = 100; for debug delete for normal
                         if ((int)repairCounterPercent == 100) {
                             stage = 0;
                             carInMechanic = false;
@@ -1866,7 +1843,8 @@ public class App extends Application {
                     }
                 break;
                 case "AdvanceStage":
-                    stage = 3; //DEBUG
+                    stage = 0; //DEBUG
+                    repairCounterPercent = 100;
                     if (repairCounterPercent == 100 && stage == 0) {
                         atStartEngineScreen = false;
                         Utils.playSound("src\\main\\resources\\com\\fsclicker\\sounds\\startCar.mp3");
@@ -2939,8 +2917,8 @@ public class App extends Application {
         buttonAuxiliary.setVisible(false);
         buttonAuxiliary.setText("GearUp");
         buttonAuxiliary.setActionCommand("GearUp");
-        setTimer(); // comment out for real, leave in for DEBUG
-        setGeneralTimer();// comment out for real, leave in for DEBUG
+//        setTimer(); // comment out for real, leave in for DEBUG
+//        setGeneralTimer();// comment out for real, leave in for DEBUG
         generalElapsedCounter.restart();
         generalElapsedCounter.start();
         moreThanOneMinuteElapsedFlag = false;
